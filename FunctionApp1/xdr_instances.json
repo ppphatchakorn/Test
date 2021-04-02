@@ -1,0 +1,10 @@
+{
+  "xdr_instances": [
+    {
+      "xdr_instance_name": "Samutsakorn hospital",
+      "xdr_api_url": "https://api-sknh.xdr.sg.paloaltonetworks.com/",
+      "xdr_auth_id": 2,
+      "xdr_auth": "Q7XiEKEDDUMv0jVN9B9YAg83FYPWHcVM8j6v5uwukjq1wIHfcmw8Yud6UmqWNkGEsR8rqewhcPm38bftwC87JNQApOu2PxcLuMw5iah1Cznbn5jRTKYK1HfCcjgGHtVn"
+    }
+  ]
+}
