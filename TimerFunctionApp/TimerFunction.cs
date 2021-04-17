@@ -11,7 +11,7 @@ namespace TimerFunctionApp
     public static class TimerFunction
     {
         [FunctionName("TimerFunction-1")]
-        public static void Run([TimerTrigger("0 */1 * * * *")]TimerInfo myTimer, ILogger log)
+        public static void Run([TimerTrigger("0 */5 * * * *")]TimerInfo myTimer, ILogger log)
         {
             var message = $"Timer API app triggered on : {DateTime.Now}";
             log.LogInformation(message);
@@ -28,8 +28,9 @@ namespace TimerFunctionApp
             lineRequest.AddOrUpdateParameter("Message", message);
             //request.AddParameter("stickerPackageId", "1");
             //request.AddParameter("stickerId", "5");
-            IRestResponse lineResponse = lineClient.Execute(lineRequest);
-            Console.WriteLine(lineResponse.Content);
+            //IRestResponse lineResponse = lineClient.Execute(lineRequest);
+            IRestResponse lineResponse;
+            //Console.WriteLine(lineResponse.Content);
 
             //start
 
@@ -66,7 +67,7 @@ namespace TimerFunctionApp
 
                     AegisAPI.GetEndpoint(instance);
 
-                    List<XdrIncident> incidents = AegisAPI.GetIncidents(instance, "new", 0, 10);
+                    List<XdrIncident> incidents = AegisAPI.GetIncidents(instance, "new", 0, 5);
                     log.LogInformation("Queried [" + incidents.Count + "] from XDR Instance :" + instance.xdr_instance_name);
 
                     foreach (XdrIncident incident in incidents)
@@ -76,7 +77,15 @@ namespace TimerFunctionApp
                             if (AegisAPI._instanceEndpoints.ContainsKey(incident.endpoint_ids[0]))
                             {
                                 log.LogInformation("Processing Incident: " + incident.incident_id + " - " + incident.description);
+                                
                                 AegisCustomer customer = AegisAPI._instanceEndpoints[incident.endpoint_ids[0]].Customer;
+                                if(customer == null)
+                                { 
+                                    log.LogError("customer = null on incident:" + incident.incident_id + incident.Json + "\r\nSkipping...");
+                                    lineRequest.AddOrUpdateParameter("Message", "customer = null on incident:" + incident.incident_id + incident.Json + "\r\nSkipping...");
+                                    lineResponse = lineClient.Execute(lineRequest);
+                                    continue;
+                                }    
                                 AegisAPI.CreateIssue(customer, incident);
 
                                 log.LogInformation("Updating Incident status on Cortex: " + incident.incident_id + " - under_investigation");
@@ -85,11 +94,15 @@ namespace TimerFunctionApp
                             else
                             {
                                 log.LogError("Unable to match Customer Data for Incident :" + incident.Json);
+                                lineRequest.AddOrUpdateParameter("Message", "Unable to match Customer Data for Incident :" + incident.Json);
+                                lineResponse = lineClient.Execute(lineRequest);
                             }
                         }
                         else
                         {
-                            log.LogError("");
+                            log.LogError("incident.endpoint_ids.Length != 0 " + incident.Json);
+                            lineRequest.AddOrUpdateParameter("Message", "Unable to match Customer Data for Incident :" + incident.Json);
+                            lineResponse = lineClient.Execute(lineRequest);
                         }
 
                         incidentCounter++;
@@ -107,7 +120,7 @@ namespace TimerFunctionApp
                 log.LogError(e.StackTrace);
 
 
-                lineRequest.AddOrUpdateParameter("Message", "API app encountered an error\r\n" + e.Message);
+                lineRequest.AddOrUpdateParameter("Message", "API app encountered an error\r\n" + e.Message + "\r\n" + e.StackTrace);
                 lineResponse = lineClient.Execute(lineRequest);
                 return;
             }
@@ -120,7 +133,7 @@ namespace TimerFunctionApp
 
             log.LogInformation("Total Process time: " + totalTime.TotalSeconds);
 
-            lineRequest.AddOrUpdateParameter("Message","Batch total process time: " + totalTime.TotalSeconds + "\r\nBatch total process incident: " + incidentCounter);
+            lineRequest.AddOrUpdateParameter("Message",message + "\r\nBatch total process time: " + totalTime.TotalSeconds + "\r\nBatch total process incident: " + incidentCounter);
             lineResponse = lineClient.Execute(lineRequest);
            
 

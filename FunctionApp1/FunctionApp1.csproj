@@ -9,6 +9,7 @@
     <Compile Remove="XdrInstance.cs" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Google.Cloud.Dialogflow.V2" Version="3.1.0" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.11" />
     <PackageReference Include="RestSharp" Version="106.11.7" />
   </ItemGroup>
