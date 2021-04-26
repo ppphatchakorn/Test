@@ -7,7 +7,7 @@ namespace ChunbokAegis
     public class XdrIncident
     {
         public string Json;
-        public XdrEndpoint Endpoint;
+        //public XdrEndpoint[] Endpoint;
 
         public string incident_id;
         public string incident_name;

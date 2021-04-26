@@ -11,7 +11,7 @@ namespace TimerFunctionApp
     public static class TimerFunction
     {
         [FunctionName("TimerFunction-1")]
-        public static void Run([TimerTrigger("0 */5 * * * *")]TimerInfo myTimer, ILogger log)
+        public static void Run([TimerTrigger("0 * * * * *")]TimerInfo myTimer, ILogger log)
         {
             var message = $"Timer API app triggered on : {DateTime.Now}";
             log.LogInformation(message);
@@ -67,35 +67,43 @@ namespace TimerFunctionApp
 
                     AegisAPI.GetEndpoint(instance);
 
-                    List<XdrIncident> incidents = AegisAPI.GetIncidents(instance, "new", 0, 5);
+                    List<XdrIncident> incidents = AegisAPI.GetIncidents(instance, "new", 370, 400);
                     log.LogInformation("Queried [" + incidents.Count + "] from XDR Instance :" + instance.xdr_instance_name);
 
                     foreach (XdrIncident incident in incidents)
                     {
                         if (incident.endpoint_ids.Length != 0)
                         {
-                            if (AegisAPI._instanceEndpoints.ContainsKey(incident.endpoint_ids[0]))
+                            for (int i = 0; i < incident.endpoint_ids.Length; i++)
                             {
-                                log.LogInformation("Processing Incident: " + incident.incident_id + " - " + incident.description);
-                                
-                                AegisCustomer customer = AegisAPI._instanceEndpoints[incident.endpoint_ids[0]].Customer;
-                                if(customer == null)
-                                { 
-                                    log.LogError("customer = null on incident:" + incident.incident_id + incident.Json + "\r\nSkipping...");
-                                    lineRequest.AddOrUpdateParameter("Message", "customer = null on incident:" + incident.incident_id + incident.Json + "\r\nSkipping...");
-                                    lineResponse = lineClient.Execute(lineRequest);
-                                    continue;
-                                }    
-                                AegisAPI.CreateIssue(customer, incident);
+                                string endpoint_id = incident.endpoint_ids[i];
+                                string host = incident.hosts[i];
 
-                                log.LogInformation("Updating Incident status on Cortex: " + incident.incident_id + " - under_investigation");
-                                AegisAPI.UpdateIncidentStatus(instance, incident, "under_investigation");
-                            }
-                            else
-                            {
-                                log.LogError("Unable to match Customer Data for Incident :" + incident.Json);
-                                lineRequest.AddOrUpdateParameter("Message", "Unable to match Customer Data for Incident :" + incident.Json);
-                                lineResponse = lineClient.Execute(lineRequest);
+                                //if (AegisAPI._instanceEndpoints.ContainsKey(incident.endpoint_ids[0]))
+                                if (AegisAPI._instanceEndpoints.ContainsKey(endpoint_id))
+                                {
+                                    log.LogInformation("Processing Incident: " + incident.incident_id + " - " + incident.description);
+
+                                    //AegisCustomer customer = AegisAPI._instanceEndpoints[incident.endpoint_ids[0]].Customer;
+                                    AegisCustomer customer = AegisAPI._instanceEndpoints[endpoint_id].Customer;
+                                    if (customer == null)
+                                    {
+                                        log.LogError("customer = null on incident:" + incident.incident_id + incident.Json + "\r\nSkipping...");
+                                        lineRequest.AddOrUpdateParameter("Message", "customer = null on incident:" + incident.incident_id + incident.Json + "\r\nSkipping...");
+                                        lineResponse = lineClient.Execute(lineRequest);
+                                        continue;
+                                    }
+                                    AegisAPI.CreateIssue(customer, host, incident);
+
+                                    log.LogInformation("Updating Incident status on Cortex: " + incident.incident_id + " - under_investigation");
+                                    AegisAPI.UpdateIncidentStatus(instance, incident, "under_investigation");
+                                }
+                                else
+                                {
+                                    log.LogError("Unable to match Customer Data for Incident :" + incident.Json);
+                                    lineRequest.AddOrUpdateParameter("Message", "Unable to match Customer Data for Incident :" + incident.Json);
+                                    lineResponse = lineClient.Execute(lineRequest);
+                                }
                             }
                         }
                         else

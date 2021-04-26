@@ -287,7 +287,7 @@ namespace ChunbokAegis
         }
 
         //public static void CreateIssue(AegisCustomer customer, XdrIncident incident, string serviceDeskId, string requestTypeId, string email)
-        public static void CreateIssue(AegisCustomer customer, XdrIncident incident)
+        public static void CreateIssue(AegisCustomer customer, string host, XdrIncident incident)
         {
             // All desired field
             string summary;
@@ -299,7 +299,7 @@ namespace ChunbokAegis
                 summary = incident.description;
 
             
-            string host = incident.hosts[0];
+            //string host = incident.hosts[0];
             string source = incident.incident_sources[0];
             string datetime_ISO8601 = incident.creation_time.ToString("o");
 
