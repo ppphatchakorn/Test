@@ -67,7 +67,6 @@ namespace ChunbokAegis
                 //Console.WriteLine(c);
 
                 var customer = new AegisCustomer();
-                
 
                 customer.customer_name = c.customer_name;
                 customer.xdr_group_name = c.xdr_group_name;
@@ -180,8 +179,6 @@ namespace ChunbokAegis
 
             foreach (var inc in data.reply.incidents)
             {
-
-
                 string tickStr;
                 long tick;
 
