@@ -38,11 +38,6 @@ namespace ChunbokAegis
                 instance.xdr_auth_id = ins.xdr_auth_id;
                 instance.xdr_auth = ins.xdr_auth;
 
-                //Console.WriteLine(i + ". xdrInstance.xdr_instance_name: " + xdrInstance.xdr_instance_name);
-                //Console.WriteLine(i + ". xdrInstance.xdr_api_url: " + xdrInstance.xdr_api_url);
-                //Console.WriteLine(i + ". xdrInstance.xdr_auth_id: " + xdrInstance.xdr_auth_id);
-                //Console.WriteLine(i + ". xdrInstance.xdr_auth: " + xdrInstance.xdr_auth);
-
                 _allInstances.Add(instance);
                 i++;
 
@@ -77,13 +72,6 @@ namespace ChunbokAegis
                 customer.jsm_requestTypeId = c.jsm_requestTypeId;
                 customer.jsm_reporter_email = c.jsm_reporter_email;
 
-                //Console.WriteLine(i + "." + customer.customer_name);
-                //Console.WriteLine(i + "." + customer.xdr_group_name);
-                //Console.WriteLine(i + "." + customer.jsm_url);
-                //Console.WriteLine(i + "." + customer.jsm_project_id);
-                //Console.WriteLine(i + "." + customer.jsm_issuetype_id);
-                //Console.WriteLine(i + "." + customer.jsm_reporter_email);
-
                 _allCustomers.Add(customer.xdr_group_name, customer);
                 i++;
 
@@ -107,8 +95,6 @@ namespace ChunbokAegis
             request.AddParameter("application/json", "{\"request_data\":{}}", ParameterType.RequestBody);
             
             IRestResponse response = client.Execute(request);
-            //Assert.IsNotNull(response);
-            //Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
 
             dynamic data = JsonConvert.DeserializeObject(response.Content);
 
@@ -170,10 +156,6 @@ namespace ChunbokAegis
             request.AddParameter("application/json", "{\"request_data\":{\"filters\":[{\"field\": \"status\",\"operator\": \"eq\",\"value\": \"" + status + "\"}],\"search_from\": " + search_from + ",\"search_to\": " + search_to + ",\"sort\": {\"field\": \"creation_time\",\"keyword\": \"asc\"}}}", ParameterType.RequestBody);
             IRestResponse response = client.Execute(request);
             
-            //IRestResponse response = null;
-            //response.StatusCode = HttpStatusCode.Unauthorized;
-            //Assert.IsNotNull(response);
-            //Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
 
             dynamic data = JsonConvert.DeserializeObject(response.Content);
 
@@ -232,17 +214,6 @@ namespace ChunbokAegis
                 //if hosts != 1, throw this incident into a temp Project
                 //parse - hosts = endpoint_name + endpoint_id
 
-                //Console.WriteLine("inc.hosts = " + inc.hosts);
-                //Console.WriteLine("inc.users = " + inc.users);
-                //Console.WriteLine("inc.incident_sources = " + inc.incident_sources);
-
-                //Console.WriteLine("inc.hosts[] = " + inc.hosts[0]);
-                //Console.WriteLine("inc.users[] = " + inc.users[0]);
-                //Console.WriteLine("inc.incident_sources[] = " + inc.incident_sources[0]);
-                //incident.hosts = inc.hosts;
-                //incident.users = inc.users;
-                //incident.incident_sources = inc.incident_sources;
-
                 List<string> tempArray_1 = new List<string>();
                 List<string> tempArray_2 = new List<string>();
 
@@ -267,12 +238,6 @@ namespace ChunbokAegis
                     tempArray_1.Add(node.ToString());
                 incident.incident_sources = tempArray_1.ToArray();
                 tempArray_1.Clear();
-
-
-                //Console.WriteLine("incident.hosts[] = " + incident.hosts[0]);
-                //Console.WriteLine("incident.endpoint_id[] = " + incident.endpoint_ids[0]);
-                //Console.WriteLine("incident.users[] = " + incident.users[0]);
-                //Console.WriteLine("incident.incident_sources[] = " + incident.incident_sources[0]);
 
                 incident.rule_based_score = inc.rule_based_score;
                 incident.manual_score = inc.manual_score;
@@ -330,9 +295,6 @@ namespace ChunbokAegis
             Console.WriteLine("Updating Instance: " + instance.xdr_instance_name + " Incident :" + incident.incident_id + " - " + status);
 
             IRestResponse response = client.Execute(request);
-            //Assert.IsNotNull(response);
-            //Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-
             Console.WriteLine(response.Content);
 
             return;
