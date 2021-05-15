@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using ChunbokAegis;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
@@ -10,7 +12,7 @@ namespace TimerFunctionApp
 {
     public static class TimerFunction
     {
-        [FunctionName("TimerFunction-1")]
+        [FunctionName("TimerFunction-AegisAPI")]
         public static void Run([TimerTrigger("0 */5 * * * *")]TimerInfo myTimer, ILogger log)
         {
             var message = $"Timer API app triggered on : {DateTime.Now}";
@@ -35,8 +37,14 @@ namespace TimerFunctionApp
             //Initialize Collections 
             DateTime startTime = DateTime.Now;
 
-            string instanceFile = @"xdr_instances.json";
-            string customerFile = @"aegis_customers.json";
+            var binDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var rootDirectory = Path.GetFullPath(Path.Combine(binDirectory, ".."));
+
+            log.LogInformation("binDirectory = " + binDirectory);
+            log.LogInformation("rootDirectory =  " + rootDirectory);
+
+            string instanceFile = rootDirectory + @"\xdr_instances.json";
+            string customerFile = rootDirectory + @"\aegis_customers.json";
 
             AegisAPI._allInstances = new List<XdrInstance>();
             AegisAPI._allCustomers = new Dictionary<string, AegisCustomer>();
