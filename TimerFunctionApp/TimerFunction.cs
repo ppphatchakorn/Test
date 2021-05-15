@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using ChunbokAegis;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
@@ -10,8 +12,8 @@ namespace TimerFunctionApp
 {
     public static class TimerFunction
     {
-        [FunctionName("TimerFunction-1")]
-        public static void Run([TimerTrigger("0 */1 * * * *")]TimerInfo myTimer, ILogger log)
+        [FunctionName("TimerFunction-AegisAPI")]
+        public static void Run([TimerTrigger("0 */5 * * * *")]TimerInfo myTimer, ILogger log)
         {
             var message = $"Timer API app triggered on : {DateTime.Now}";
             log.LogInformation(message);
@@ -26,26 +28,31 @@ namespace TimerFunctionApp
             //lineRequest.AddHeader("Authorization", "Bearer mIo43lLJOSwDSeuBlR65TPYujBlHextkRN22ZWO9XjK");
             lineRequest.AddHeader("Content-Type", "application/x-www-form-urlencoded");
             lineRequest.AddOrUpdateParameter("Message", message);
-            //request.AddParameter("stickerPackageId", "1");
-            //request.AddParameter("stickerId", "5");
-            IRestResponse lineResponse = lineClient.Execute(lineRequest);
-            Console.WriteLine(lineResponse.Content);
+            //IRestResponse lineResponse = lineClient.Execute(lineRequest);
+            IRestResponse lineResponse;
+            //Console.WriteLine(lineResponse.Content);
 
             //start
 
             //Initialize Collections 
             DateTime startTime = DateTime.Now;
 
-            string instanceFile = @"xdr_instances.json";
-            string customerFile = @"aegis_customers.json";
+            var binDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var rootDirectory = Path.GetFullPath(Path.Combine(binDirectory, ".."));
 
-            AegisAPI._allInstances = new List<ChunbokAegis.XdrInstance>();
-            AegisAPI._allCustomers = new Dictionary<string, ChunbokAegis.AegisCustomer>();
+            log.LogInformation("binDirectory = " + binDirectory);
+            log.LogInformation("rootDirectory =  " + rootDirectory);
+
+            string instanceFile = rootDirectory + @"\xdr_instances.json";
+            string customerFile = rootDirectory + @"\aegis_customers.json";
+
+            AegisAPI._allInstances = new List<XdrInstance>();
+            AegisAPI._allCustomers = new Dictionary<string, AegisCustomer>();
 
             int instanceCounter = 0;
             int incidentCounter = 0;
-            try
 
+            try
             {
                 log.LogInformation("Reading XDR Instance list file: " + instanceFile);
                 AegisAPI.ReadXdrInstanceList(instanceFile);
@@ -61,35 +68,65 @@ namespace TimerFunctionApp
                 {
                     DateTime start = DateTime.Now;
                     
-
                     log.LogInformation("Processing XDR Instances [" + instanceCounter + "] : " + instance.xdr_instance_name);
 
                     AegisAPI.GetEndpoint(instance);
 
-                    List<XdrIncident> incidents = AegisAPI.GetIncidents(instance, "new", 0, 10);
+                    List<XdrIncident> incidents = AegisAPI.GetIncidents(instance, "new", 0, 50);
                     log.LogInformation("Queried [" + incidents.Count + "] from XDR Instance :" + instance.xdr_instance_name);
 
                     foreach (XdrIncident incident in incidents)
                     {
-                        if (incident.endpoint_ids.Length != 0)
+                        // Check if the incident contains endpoint(s) (host)
+                        if (incident.endpoint_ids.Length == 0)
                         {
-                            if (AegisAPI._instanceEndpoints.ContainsKey(incident.endpoint_ids[0]))
-                            {
-                                log.LogInformation("Processing Incident: " + incident.incident_id + " - " + incident.description);
-                                AegisCustomer customer = AegisAPI._instanceEndpoints[incident.endpoint_ids[0]].Customer;
-                                AegisAPI.CreateIssue(customer, incident);
+                            log.LogError("incident.endpoint_ids.Length == 0 " + incident.Json);
+                            lineRequest.AddOrUpdateParameter("Message", "Unable to match Customer Data for Incident :" + incident.Json);
+                            lineResponse = lineClient.Execute(lineRequest);
+                            
+                            continue;
+                        }
 
-                                log.LogInformation("Updating Incident status on Cortex: " + incident.incident_id + " - under_investigation");
-                                AegisAPI.UpdateIncidentStatus(instance, incident, "under_investigation");
-                            }
-                            else
+                        // Iterate through endpoint(s)
+                        List<AegisCustomer> checkDuplicateCustomer = new List<AegisCustomer>();
+
+                        for (int i = 0; i < incident.endpoint_ids.Length; i++)
+                        {
+                            string endpoint_id = incident.endpoint_ids[i];
+                            string host = incident.hosts[i];
+
+                            // If unable to find
+                            if (!AegisAPI._instanceEndpoints.ContainsKey(endpoint_id))
                             {
                                 log.LogError("Unable to match Customer Data for Incident :" + incident.Json);
+                                lineRequest.AddOrUpdateParameter("Message", "Unable to match Customer Data for Incident :" + incident.Json);
+                                lineResponse = lineClient.Execute(lineRequest);
+
+                                continue;
                             }
-                        }
-                        else
-                        {
-                            log.LogError("");
+                            
+                            log.LogInformation("Processing Incident: " + incident.incident_id + " - " + incident.description);
+
+                            AegisCustomer customer = AegisAPI._instanceEndpoints[endpoint_id].Customer;
+                            if (customer == null)
+                            {
+                                log.LogError("customer = null on incident:" + incident.incident_id + incident.Json + "\r\nSkipping...");
+                                lineRequest.AddOrUpdateParameter("Message", "customer = null on incident:" + incident.incident_id + incident.Json + "\r\nSkipping...");
+                                lineResponse = lineClient.Execute(lineRequest);
+                                continue;
+                            }
+
+                            if (checkDuplicateCustomer.Contains(customer))
+                                continue;
+
+                            checkDuplicateCustomer.Add(customer);
+
+                            //***** Has to check status. if create not success, don't update the incident status ******
+                            AegisAPI.CreateIssue(customer, host, incident);
+
+                            log.LogInformation("Updating Incident status on Cortex: " + incident.incident_id + " - under_investigation");
+                            AegisAPI.UpdateIncidentStatus(instance, incident, "under_investigation");
+                            
                         }
 
                         incidentCounter++;
@@ -106,8 +143,7 @@ namespace TimerFunctionApp
                 log.LogError(e.Message);
                 log.LogError(e.StackTrace);
 
-
-                lineRequest.AddOrUpdateParameter("Message", "API app encountered an error\r\n" + e.Message);
+                lineRequest.AddOrUpdateParameter("Message", "API app encountered an error\r\n" + e.Message + "\r\n" + e.StackTrace);
                 lineResponse = lineClient.Execute(lineRequest);
                 return;
             }
@@ -120,13 +156,12 @@ namespace TimerFunctionApp
 
             log.LogInformation("Total Process time: " + totalTime.TotalSeconds);
 
-            lineRequest.AddOrUpdateParameter("Message","Batch total process time: " + totalTime.TotalSeconds + "\r\nBatch total process incident: " + incidentCounter);
+            lineRequest.AddOrUpdateParameter("Message",message + "\r\nBatch total process time: " + totalTime.TotalSeconds + "\r\nBatch total process incident: " + incidentCounter);
             lineResponse = lineClient.Execute(lineRequest);
            
 
             Console.WriteLine(lineResponse.Content);
-
-
+           
         }
     }
 }

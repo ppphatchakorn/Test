@@ -24,13 +24,13 @@
     },
     {
       "customer_name": "Samut Sakhon Hospital",
-      "xdr_group_name": "SKNH-Group",
+      "xdr_group_name": "SKNH",
 
       "jsm_url": "https://varakorncbk.atlassian.net/",
       "jsm_project_name": "SamutSakhonHospital",
       "jsm_project_key": "SAM",
       "jsm_serviceDeskId": 1,
-      "jsm_requestTypeId": 61,
+      "jsm_requestTypeId": 63,
       "jsm_reporter_email": "aegiscbk333@hotmail.com"
     }
   ]
