@@ -13,7 +13,7 @@ namespace TimerFunctionApp
     public static class TimerFunction
     {
         [FunctionName("TimerFunction-AegisAPI")]
-        public static void Run([TimerTrigger("0 */5 * * * *")]TimerInfo myTimer, ILogger log)
+        public static void Run([TimerTrigger("0 * * * * *")]TimerInfo myTimer, ILogger log)
         {
             var message = $"Timer API app triggered on : {DateTime.Now}";
             log.LogInformation(message);
