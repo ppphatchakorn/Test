@@ -5,12 +5,14 @@
       "xdr_group_name": "UBNTH",
 
       "jsm_url": "https://aegis-sm.atlassian.net/",
+      "jsm_username": "pawarat@dataexpress.co.th",
+      "jsm_password": "oTIy8rj0DrUeRU7elD4UED5C",
+
       "jsm_project_name": "Ubonrak Thonburi Hospital",
       "jsm_project_key": "UBNTH",
+
       "jsm_serviceDeskId": 6,
       "jsm_requestTypeId": 94,
-
-
       "jsm_reporter_email": "aegiscbk111@hotmail.com"
     }
   ]

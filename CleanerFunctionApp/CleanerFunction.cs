@@ -1,18 +1,16 @@
-using System;
-using System.IO;
-using System.Threading.Tasks;
+using ChunbokAegis;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
-//using Newtonsoft.Json;
-using RestSharp;
-
-using System.Collections.Generic;
 using Newtonsoft.Json;
-using ChunbokAegis;
+using System;
+//using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace CleanerFunctionApp
 {
@@ -43,9 +41,9 @@ namespace CleanerFunctionApp
             string instanceFile = rootDirectory + @"\xdr_instances.json";
             string customerFile = rootDirectory + @"\aegis_customers.json";
 
+            AegisAPI.SetLogger(log);
             AegisAPI._allInstances = new List<ChunbokAegis.XdrInstance>();
             AegisAPI._allCustomers = new Dictionary<string, ChunbokAegis.AegisCustomer>();
-
 
             //query POST parameter (not relevant)
             string name = req.Query["name"];
@@ -59,30 +57,26 @@ namespace CleanerFunctionApp
                 : $"Hello, {name}. This HTTP triggered function executed successfully." + revision;
             //query POST parameter (not relevant)
 
-
             try
-
             {
                 log.LogInformation("Reading XDR Instance list file: " + instanceFile);
                 AegisAPI.ReadXdrInstanceList(instanceFile);
-                log.LogInformation("totalXdrInstance: " + AegisAPI._allInstances.Count);
+                //log.LogInformation("totalXdrInstance: " + AegisAPI._allInstances.Count);
 
                 log.LogInformation("Reading Aegis Customer list file: " + customerFile);
                 AegisAPI.ReadAegisCustomerList(customerFile);
-                log.LogInformation("totalAegisCustomer: " + AegisAPI._allCustomers.Count);
+                //log.LogInformation("totalAegisCustomer: " + AegisAPI._allCustomers.Count);
 
-                log.LogInformation("Interating Through XDR Instances...");
+                //log.LogInformation("Interating Through XDR Instances...");
 
                 foreach (XdrInstance instance in AegisAPI._allInstances)
                 {
                     DateTime start = DateTime.Now;
                     int i = 0;
 
-                    log.LogInformation("Processing XDR Instances [" + i + "] : " + instance.xdr_instance_name);
-
-                    log.LogInformation("Getting Endpoints from : " + instance.xdr_instance_name);
+                    log.LogInformation("Getting Endpoints from : [" + i + "] " + instance.xdr_instance_name);
                     AegisAPI.GetEndpoint(instance);
-                    log.LogInformation("Total Endpoints : " + AegisAPI._instanceEndpoints.Count);
+                    //log.LogInformation("Total Endpoints : " + AegisAPI._instanceEndpoints.Count);
 
                     List<XdrIncident> incidents = AegisAPI.GetIncidents(instance, "under_investigation", 0, 100);
                     log.LogInformation("Queried [" + incidents.Count + "] from XDR Instance :" + instance.xdr_instance_name);
@@ -93,7 +87,7 @@ namespace CleanerFunctionApp
                         //AegisAPI.CreateIssue(incident);
 
                         //log.LogInformation("Updating Incident status on Cortex: " + incident.incident_id + " - under_investigation");
-                        AegisAPI.UpdateIncidentStatus(instance, incident, "new");
+                        //AegisAPI.UpdateIncidentStatus(instance, incident, "new");
                     }
 
                     //Console.WriteLine(". xdrInstance.xdr_instance_name: " + xdrInstance.xdr_instance_name);

@@ -1,12 +1,11 @@
+using ChunbokAegis;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Extensions.Logging;
+using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using ChunbokAegis;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Host;
-using Microsoft.Extensions.Logging;
-using RestSharp;
 
 namespace TimerFunctionApp
 {
@@ -122,7 +121,7 @@ namespace TimerFunctionApp
                             checkDuplicateCustomer.Add(customer);
 
                             //***** Has to check status. if create not success, don't update the incident status ******
-                            AegisAPI.CreateIssue(customer, host, incident);
+                            AegisAPI.CreateRequest(customer, host, incident);
 
                             log.LogInformation("Updating Incident status on Cortex: " + incident.incident_id + " - under_investigation");
                             AegisAPI.UpdateIncidentStatus(instance, incident, "under_investigation");
