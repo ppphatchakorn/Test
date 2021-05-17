@@ -122,7 +122,7 @@ namespace ChunbokAegis
         public static int GetEndpoint(XdrInstance instance)
         {
             int i = 0;
-            string url = instance.xdr_api_url + "/public_api/v1/endpoints/get_endpoint/";
+            string url = instance.xdr_api_url + "public_api/v1/endpoints/get_endpoint/";
             var client = new RestClient(url);
             client.Timeout = AegisAPI.TIMEOUT;
             var request = new RestRequest(Method.POST);
@@ -477,7 +477,8 @@ namespace ChunbokAegis
 
             if (AegisAPI.IsLogged)
             {
-                AegisAPI.log.Log(LOGLEVEL, "CreateRequest by Incident :" + incident.incident_id);
+                AegisAPI.log.Log(LOGLEVEL, "Calling CreteRequest to: " + url);
+                AegisAPI.log.Log(LOGLEVEL, "CreateRequest for Incident :" + incident.incident_id);
                 string reqParams = null;
 
                 foreach (var p in request.Parameters)
@@ -516,7 +517,8 @@ namespace ChunbokAegis
         //{"reply": true}
         public static void UpdateIncidentStatus(XdrInstance instance, XdrIncident incident, string status)
         {
-            var client = new RestClient(instance.xdr_api_url + "public_api/v1/incidents/update_incident/");
+            string url = instance.xdr_api_url + "public_api/v1/incidents/update_incident/";
+            var client = new RestClient(url);
 
             client.Timeout = AegisAPI.TIMEOUT;
             var request = new RestRequest(Method.POST);
@@ -543,7 +545,8 @@ namespace ChunbokAegis
             /////
             if (AegisAPI.IsLogged)
             {
-                AegisAPI.log.Log(LOGLEVEL, "Updating Instance: " + instance.xdr_instance_name + " Incident :" + incident.incident_id + " - " + status);
+                AegisAPI.log.Log(LOGLEVEL, "Calling UpdateIncident to: " + url);
+                AegisAPI.log.Log(LOGLEVEL, "UpdateIncident at: " + instance.xdr_instance_name + " Incident :" + incident.incident_id + " - " + status);
                 string reqParams = null;
 
                 foreach (var p in request.Parameters)
