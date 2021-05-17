@@ -40,9 +40,10 @@ namespace TimerFunctionApp
             log.LogInformation("binDirectory = " + binDirectory);
             log.LogInformation("rootDirectory =  " + rootDirectory);
 
-            string instanceFile = rootDirectory + @"\aegis_xdr_instances-test.json";
-            string customerFile = rootDirectory + @"\aegis_customers-test.json";
+            string instanceFile = rootDirectory + @"\aegis_xdr_instances.json";
+            string customerFile = rootDirectory + @"\aegis_customers.json";
 
+            AegisAPI.SetLogger(log);
             AegisAPI._allInstances = new List<XdrInstance>();
             AegisAPI._allCustomers = new Dictionary<string, AegisCustomer>();
 

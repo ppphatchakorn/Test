@@ -424,7 +424,10 @@ namespace ChunbokAegis
             
             //string host = incident.hosts[0];
             string source = incident.incident_sources[0];
-            string datetime_ISO8601 = incident.creation_time.ToString("o");
+            
+            // ** 2017-05-17 Change Create Date from CortexXDR Time to Current Time
+            //string datetime_ISO8601 = incident.creation_time.ToString("o");
+            string datetime_ISO8601 = DateTime.Now.ToString("o");
 
             string url = customer.jsm_url + "rest/servicedeskapi/request";
             var client = new RestClient(url);
@@ -449,14 +452,26 @@ namespace ChunbokAegis
                                         new JProperty("priority",
                                             new JObject(
                                                 new JProperty("name", "Medium"))),
-                                        new JProperty("customfield_10055", datetime_ISO8601),
-                                        new JProperty("customfield_10056", incident.xdr_url),
-                                        new JProperty("customfield_10057", incident.description),
-                                        new JProperty("customfield_10058", incident.incident_id),
-                                        new JProperty("customfield_10059",
+                                         // Fields set of - varakoncbk.atlassian.net
+                                         //new JProperty("customfield_10055", datetime_ISO8601),
+                                         //new JProperty("customfield_10056", incident.xdr_url),
+                                         //new JProperty("customfield_10057", incident.description),
+                                         //new JProperty("customfield_10058", incident.incident_id),
+                                         //new JProperty("customfield_10059",
+                                         //    new JObject(
+                                         //        new JProperty("value", source))),
+                                         //new JProperty("customfield_10062", host))),
+                                        // 
+                                        // Fields set of - aegis-sm.atlassian.net
+                                        new JProperty("customfield_10054", datetime_ISO8601),
+                                        new JProperty("customfield_10055", incident.xdr_url),
+                                        new JProperty("customfield_10056", incident.description),
+                                        new JProperty("customfield_10057", incident.incident_id),
+                                        new JProperty("customfield_10058",
                                             new JObject(
                                                 new JProperty("value", source))),
-                                        new JProperty("customfield_10062", host))),
+                                        new JProperty("customfield_10061", host))),
+
                                 new JProperty("raiseOnBehalfOf", customer.jsm_reporter_email));
             request.AddParameter("application/json", json.ToString(), ParameterType.RequestBody);
 

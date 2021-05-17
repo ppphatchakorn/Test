@@ -35,8 +35,8 @@ namespace CleanerFunctionApp
             log.LogInformation("binDirectory = " + binDirectory);
             log.LogInformation("rootDirectory =  " + rootDirectory);
 
-            string instanceFile = rootDirectory + @"\aegis_xdr_instances-test.json";
-            string customerFile = rootDirectory + @"\aegis_customers-test.json";
+            string instanceFile = rootDirectory + @"\aegis_xdr_instances.json";
+            string customerFile = rootDirectory + @"\aegis_customers.json";
 
             AegisAPI.SetLogger(log);
             AegisAPI._allInstances = new List<ChunbokAegis.XdrInstance>();
@@ -63,8 +63,8 @@ namespace CleanerFunctionApp
                 AegisAPI.ReadAegisCustomerList(customerFile);
 
                 //Incident status "under_investigation" OR "new"
-                string currentStatus = "under_investigation";
-                string newStatus = "under_investigation";
+                string currentStatus = "new";
+                string newStatus = "new";
 
                 foreach (XdrInstance instance in AegisAPI._allInstances)
                 {
@@ -76,7 +76,7 @@ namespace CleanerFunctionApp
                     //log.LogInformation("Total Endpoints: " + AegisAPI._instanceEndpoints.Count);
 
                     log.LogInformation("\r\n***\r\n*** Getting Incidents from: " + instance.xdr_instance_name + " with status = \"" + currentStatus + "\"");
-                    List<XdrIncident> incidents = AegisAPI.GetIncidents(instance, currentStatus, 0, 3);
+                    List<XdrIncident> incidents = AegisAPI.GetIncidents(instance, currentStatus, 0, 100);
                     ///log.LogInformation("Queried [" + incidents.Count + "] from XDR Instance :" + instance.xdr_instance_name);
 
                     foreach (XdrIncident incident in incidents)
