@@ -1,0 +1,10 @@
+{
+  "xdr_instances": [
+    {
+      "xdr_instance_name": "Ubonrak Thonburi Hospital",
+      "xdr_api_url": "https://api-thg-xdr-sys1.xdr.sg.paloaltonetworks.com/",
+      "xdr_auth_id": 5,
+      "xdr_auth": "vfW8OwovquHo2w20GAoCuP07T94HG1pZmpXbyjIrneEA03MrqyeRJ86ucnWIMTvOMJiiuYy3HJgofKOunqFgeYE1iDOP5GeRyszuAsl3z6Gs8AfoSEOl0AEr5gURBNiI"
+    }
+  ]
+}

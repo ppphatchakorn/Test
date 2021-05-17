@@ -1,0 +1,49 @@
+{
+  "customers": [
+    {
+      "customer_name": "Aegis Test Group",
+      "xdr_group_name": "Aegis-Group",
+
+      "jsm_url": "https://varakorncbk.atlassian.net/",
+      "jsm_username": "varakornc@chunbok.com",
+      "jsm_password": "CKWAKyQFQfF819d9RvEKAB2E",
+
+      "jsm_project_name": "Aegis-Group",
+      "jsm_project_key": "AG",
+
+      "jsm_serviceDeskId": 3,
+      "jsm_requestTypeId": 61,
+      "jsm_reporter_email": "aegiscbk111@hotmail.com"
+    },
+    {
+      "customer_name": "Chunbok Test Group",
+      "xdr_group_name": "CBK-Group",
+
+      "jsm_url": "https://varakorncbk.atlassian.net/",
+      "jsm_username": "varakornc@chunbok.com",
+      "jsm_password": "CKWAKyQFQfF819d9RvEKAB2E",
+
+      "jsm_project_name": "CBK-Group",
+      "jsm_project_key": "CG",
+
+      "jsm_serviceDeskId": 4,
+      "jsm_requestTypeId": 62,
+      "jsm_reporter_email": "aegiscbk222@hotmail.com"
+    },
+    {
+      "customer_name": "Samut Sakhon Hospital",
+      "xdr_group_name": "SKNH",
+
+      "jsm_url": "https://varakorncbk.atlassian.net/",
+      "jsm_username": "varakornc@chunbok.com",
+      "jsm_password": "CKWAKyQFQfF819d9RvEKAB2E",
+
+      "jsm_project_name": "SamutSakhonHospital",
+      "jsm_project_key": "SAM",
+
+      "jsm_serviceDeskId": 1,
+      "jsm_requestTypeId": 63,
+      "jsm_reporter_email": "aegiscbk333@hotmail.com"
+    }
+  ]
+}
