@@ -74,7 +74,9 @@ namespace ConsoleApp1
 
             Console.WriteLine(rss.ToString());
 
-            
+
+            string auth = System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes("pawarat@dataexpress.co.th" + ":" + "oTIy8rj0DrUeRU7elD4UED5C"));
+            Console.WriteLine(auth);
         }
     }
 }

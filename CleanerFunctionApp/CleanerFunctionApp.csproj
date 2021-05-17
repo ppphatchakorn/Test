@@ -13,6 +13,9 @@
     <ProjectReference Include="..\ChunbokAegis\ChunbokAegis.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <None Update="aegis_customers-test.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="aegis_customers.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -23,7 +26,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
-    <None Update="xdr_instances.json">
+    <None Update="aegis_xdr_instances-test.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="aegis_xdr_instances.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

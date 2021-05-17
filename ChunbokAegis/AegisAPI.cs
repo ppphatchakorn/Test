@@ -8,19 +8,18 @@ using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
 
-//version 0.1 
+//version 0.2
 
 namespace ChunbokAegis
 {
     public class AegisAPI
     {
         //timeout 10s
-        const int TIMEOUT = 10000;
+        const int TIMEOUT = 5000;
         const LogLevel LOGLEVEL = LogLevel.Information;
         
         static ILogger log;
         public static bool IsLogged { get; private set; } = false;
-
 
         public static List<XdrInstance> _allInstances;
         public static Dictionary<string, AegisCustomer> _allCustomers;
@@ -85,7 +84,6 @@ namespace ChunbokAegis
             if (AegisAPI.IsLogged)
             {
                 AegisAPI.log.Log(LOGLEVEL, "Reading Customer List from file: " + filename);
-                AegisAPI.log.Log(LOGLEVEL, ((object)data).ToString());
             }
 
             foreach (var c in data.customers)
@@ -100,7 +98,7 @@ namespace ChunbokAegis
                 customer.xdr_group_name = c.xdr_group_name;
                 customer.jsm_url = c.jsm_url;
                 customer.jsm_username = c.jsm_username;
-                customer.jsm_username = c.jsm_password;
+                customer.jsm_password = c.jsm_password;
                 customer.jsm_serviceDeskId = c.jsm_serviceDeskId;
                 customer.jsm_requestTypeId = c.jsm_requestTypeId;
                 customer.jsm_reporter_email = c.jsm_reporter_email;
@@ -220,7 +218,7 @@ namespace ChunbokAegis
                     //Console.WriteLine(i + "." + endpoint.Customer.customer_name + " " + endpoint.Customer.jsm_reporter_email);
                     if (AegisAPI.IsLogged)
                     {
-                        AegisAPI.log.Log(LOGLEVEL, "  - Customer Found: \"" + endpoint.Customer.customer_name + "\" - " + endpoint.Customer.jsm_reporter_email);
+                        AegisAPI.log.Log(LOGLEVEL, "  - Customer Found: \"" + endpoint.Customer.customer_name + "\" - " + endpoint.Customer.jsm_reporter_email + "\r\n");
                     }
                 }
                 else
@@ -228,7 +226,7 @@ namespace ChunbokAegis
                     //Console.WriteLine("NO_CUSTOMER");
                     if (AegisAPI.IsLogged)
                     {
-                        AegisAPI.log.Log(LOGLEVEL, i + "  - Customer NOT FOUND for this Endpoint");
+                        AegisAPI.log.Log(LOGLEVEL, i + "  - Customer NOT FOUND for this Endpoint\r\n");
                     }
                 }
                 //Console.WriteLine(i + "." + endpoint.Customer ?? endpoint.Customer.customer_name ?? "NO_CUSTOMER" + " " + endpoint.Customer.jsm_reporter_email);
@@ -322,7 +320,7 @@ namespace ChunbokAegis
                 //Console.WriteLine(e);
                 if (AegisAPI.IsLogged)
                 {
-                    AegisAPI.log.Log(LOGLEVEL, "Parsing Incident JSON object.");
+                    AegisAPI.log.Log(LOGLEVEL, "\r\nParsing Incident JSON object...");
                     AegisAPI.log.Log(LOGLEVEL, ((object)inc).ToString());
                 }
 
@@ -434,7 +432,8 @@ namespace ChunbokAegis
             var request = new RestRequest(Method.POST);
             request.AddHeader("Accept", "application/json");
             request.AddHeader("Content-Type", "application/json");
-            string auth = System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(""));
+
+            string auth = System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(customer.jsm_username + ":" + customer.jsm_password));
             request.AddHeader("Authorization", "Basic " + auth);
 
             //request.AddParameter("application/json", "{\"serviceDeskId\": \"3\",\"requestTypeId\": \"61\",\"requestFieldValues\": {\"summary\": \"Report a very critical Security Incident!!! via REST\",\"description\": \"test description\",\"priority\": {\"name\": \"High\"},\"customfield_10055\": \"1984-07-07T07:07:07.777+0700\",\"customfield_10056\": \"xdr_url\",\"customfield_10057\": \"description\",\"customfield_10058\": \"incident_id\",\"customfield_10059\": {\"value\": \"XDR Agent\"},\"customfield_10062\": \"host\"},\"raiseOnBehalfOf\": \"dummy@gmail.com\"}", ParameterType.RequestBody);
@@ -480,7 +479,7 @@ namespace ChunbokAegis
 
             IRestResponse response = client.Execute(request);
 
-            if (response.StatusCode != HttpStatusCode.OK)
+            if (response.StatusCode != HttpStatusCode.Created)
             {
                 throw new Exception("Calling CreateRequest returned status :" + response.StatusCode);
             }
@@ -492,7 +491,10 @@ namespace ChunbokAegis
             //    throw new Exception("CreateRequest returned status :" + response.StatusCode);
             //}
 
+            AegisAPI.log.Log(LOGLEVEL, "*** Calling CreateRequest sucessfully ***");
+            AegisAPI.log.Log(LOGLEVEL, response.Content);
             //Console.WriteLine(response.Content);
+
         }
 
         //use only "new" and "under_investigation"
@@ -511,10 +513,10 @@ namespace ChunbokAegis
             JObject json = new JObject(
                                 new JProperty("request_data",
                                     new JObject(
-                                        new JProperty("incident_id", ""),
+                                        new JProperty("incident_id", incident.incident_id),
                                         new JProperty("update_data",
                                             new JObject(
-                                                new JProperty("status", ""))))));
+                                                new JProperty("status", status))))));
             request.AddParameter("application/json", json.ToString(), ParameterType.RequestBody);
 
             //if (AegisAPI.IsLogged)
