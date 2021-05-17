@@ -96,7 +96,7 @@ namespace CleanerFunctionApp
                         // Check if an Incident contains Endpoint(s) (host), If not, skip this Incident
                         if (incident.endpoint_ids.Length == 0)
                         {
-                            log.LogError("incident.endpoint_ids.Length == 0 " + incident.Json);
+                            log.LogError("ERROR - incident.endpoint_ids.Length == 0 " + incident.Json);
                             //lineRequest.AddOrUpdateParameter("Message", "Unable to match Customer Data for Incident :" + incident.Json);
                             //lineResponse = lineClient.Execute(lineRequest);
 
@@ -120,7 +120,7 @@ namespace CleanerFunctionApp
                             // Skip if unable to find the Customer for Endpoint
                             if (!AegisAPI._instanceEndpoints.ContainsKey(endpoint_id))
                             {
-                                log.LogError("Unable to match Customer Data for Incident :" + incident.Json);
+                                log.LogError("ERROR - Unable to match Customer Data for Incident :" + incident.Json);
                                 //lineRequest.AddOrUpdateParameter("Message", "Unable to match Customer Data for Incident :" + incident.Json);
                                 //lineResponse = lineClient.Execute(lineRequest);
                                 continue;
@@ -129,7 +129,7 @@ namespace CleanerFunctionApp
                             AegisCustomer customer = AegisAPI._instanceEndpoints[endpoint_id].Customer;
                             if (customer == null)
                             {
-                                log.LogError("Customer = null on Incident:" + incident.incident_id + incident.Json + "\r\nSkipping...");
+                                log.LogError("ERROR - Customer = null on Incident:" + incident.incident_id + incident.Json + "\r\nSkipping...");
                                 //lineRequest.AddOrUpdateParameter("Message", "customer = null on incident:" + incident.incident_id + incident.Json + "\r\nSkipping...");
                                 //lineResponse = lineClient.Execute(lineRequest);
                                 continue;
@@ -165,11 +165,11 @@ namespace CleanerFunctionApp
             }
             catch (Exception e)
             {
-                log.LogInformation("**** ERROR FOUND - Excepetion catched ****");
+                log.LogError("**** ERROR FOUND - Excepetion catched ****");
                 log.LogError(e.Message);
                 log.LogError(e.StackTrace);
 
-                log.LogInformation("*** Code Excecuted with ERROR.");
+                log.LogError("*** Code Excecuted with ERROR.");
                 return new OkObjectResult("This HTTP triggered function executed with ERROR. " + revision);
             }
 

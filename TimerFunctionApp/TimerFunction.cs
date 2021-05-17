@@ -85,7 +85,7 @@ namespace TimerFunctionApp
                         // Check if an Incident contains Endpoint(s) (host), If not, skip this Incident
                         if (incident.endpoint_ids.Length == 0)
                         {
-                            log.LogError("incident.endpoint_ids.Length == 0 " + incident.Json);
+                            log.LogError("Error - incident.endpoint_ids.Length == 0 " + incident.Json);
                             //lineRequest.AddOrUpdateParameter("Message", "Unable to match Customer Data for Incident :" + incident.Json);
                             //lineResponse = lineClient.Execute(lineRequest);
 
@@ -109,7 +109,7 @@ namespace TimerFunctionApp
                             // Skip if unable to find the Customer for Endpoint
                             if (!AegisAPI._instanceEndpoints.ContainsKey(endpoint_id))
                             {
-                                log.LogError("Unable to match Customer Data for Incident :" + incident.Json);
+                                log.LogError("ERROR - Unable to match Customer Data for Incident :" + incident.Json);
                                 lineRequest.AddOrUpdateParameter("Message", "Unable to match Customer Data for Incident :" + incident.Json);
                                 lineResponse = lineClient.Execute(lineRequest);
                                 continue;
@@ -118,7 +118,7 @@ namespace TimerFunctionApp
                             AegisCustomer customer = AegisAPI._instanceEndpoints[endpoint_id].Customer;
                             if (customer == null)
                             {
-                                log.LogError("Customer = null on Incident:" + incident.incident_id + incident.Json + "\r\nSkipping...");
+                                log.LogError("ERROR - Customer = null on Incident:" + incident.incident_id + incident.Json + "\r\nSkipping...");
                                 lineRequest.AddOrUpdateParameter("Message", "customer = null on incident:" + incident.incident_id + incident.Json + "\r\nSkipping...");
                                 lineResponse = lineClient.Execute(lineRequest);
                                 continue;
@@ -160,20 +160,14 @@ namespace TimerFunctionApp
                 return;
             }
 
-            //Console.WriteLine(incidents.reply.incidents);
-
-
             DateTime endTime = DateTime.Now;
             TimeSpan totalTime = new TimeSpan(endTime.Ticks - startTime.Ticks);
 
-            log.LogInformation("Total Process time: " + totalTime.TotalSeconds);
-
-            lineRequest.AddOrUpdateParameter("Message",message + "\r\nBatch total process time: " + totalTime.TotalSeconds + "\r\nBatch total process incident: " + incidentCounter);
+            log.LogInformation("TimerFunction-AegisAPI run successfully. Total Process time: " + totalTime.TotalSeconds);
+            lineRequest.AddOrUpdateParameter("Message",message + "\r\nTimerFunction-AegisAPI run successfully. Total Process time: " + totalTime.TotalSeconds + "\r\nBatch total process incident: " + incidentCounter);
             lineResponse = lineClient.Execute(lineRequest);
            
-
-            Console.WriteLine(lineResponse.Content);
-           
+            //Console.WriteLine(lineResponse.Content);
         }
     }
 }

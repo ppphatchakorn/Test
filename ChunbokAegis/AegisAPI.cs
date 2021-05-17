@@ -159,12 +159,12 @@ namespace ChunbokAegis
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
-                throw new Exception("Calling GetEndpoint returned status :" + response.StatusCode);
+                throw new Exception("ERROR Calling GetEndpoint returned status :" + (int)response.StatusCode + "-" + response.StatusCode);
             }
 
             if (AegisAPI.IsLogged)
             {
-                AegisAPI.log.Log(LOGLEVEL, "Calling GetEndpoint returned status :" + response.StatusCode);
+                AegisAPI.log.Log(LOGLEVEL, "Calling GetEndpoint returned status :" + (int)response.StatusCode + " - " + response.StatusCode);
             }
 
             dynamic data = JsonConvert.DeserializeObject(response.Content);
@@ -300,12 +300,12 @@ namespace ChunbokAegis
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
-                throw new Exception("Calling GetIncidents returned status :" + response.StatusCode);
+                throw new Exception("ERROR Calling GetIncidents returned status :" + (int)response.StatusCode + "-" + response.StatusCode);
             }
 
             if (AegisAPI.IsLogged)
             {
-                AegisAPI.log.Log(LOGLEVEL, "Calling GetIncidents returned status :" + response.StatusCode);
+                AegisAPI.log.Log(LOGLEVEL, "Calling GetIncidents returned status :" + (int)response.StatusCode + "-" + response.StatusCode);
             }
 
             dynamic data = JsonConvert.DeserializeObject(response.Content);
@@ -335,7 +335,7 @@ namespace ChunbokAegis
                 
                 tickStr = inc.creation_time;
                 if (!long.TryParse(tickStr, out tick))
-                    throw new Exception("Unable to parse Incident creation_time: " + inc.creation_time + "\r\n" + inc);
+                    throw new Exception("ERROR parsing Incident creation_time: " + inc.creation_time + "\r\n" + inc);
                 else
                 {
                     DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeMilliseconds(tick);
@@ -344,7 +344,7 @@ namespace ChunbokAegis
 
                 tickStr = inc.modification_time;
                 if (!long.TryParse(tickStr, out tick))
-                    throw new Exception("Unable to parse Incident modification_time: " + inc.modification_time + "\r\n" + inc);
+                    throw new Exception("ERROR parsing Incident modification_time: " + inc.modification_time + "\r\n" + inc);
                 else
                     incident.modification_time = new DateTime(tick);
 
@@ -481,7 +481,7 @@ namespace ChunbokAegis
 
             if (response.StatusCode != HttpStatusCode.Created)
             {
-                throw new Exception("Calling CreateRequest returned status :" + response.StatusCode);
+                throw new Exception("ERROR Calling CreateRequest returned status :" + (int)response.StatusCode + "-" + response.StatusCode);
             }
 
             //IRestResponse response = client.Execute(request);
@@ -491,7 +491,7 @@ namespace ChunbokAegis
             //    throw new Exception("CreateRequest returned status :" + response.StatusCode);
             //}
 
-            AegisAPI.log.Log(LOGLEVEL, "*** Calling CreateRequest sucessfully ***");
+            AegisAPI.log.Log(LOGLEVEL, "*** Calling CreateRequest sucessfully, status " + (int)response.StatusCode + " - " + response.StatusCode + " ***");
             AegisAPI.log.Log(LOGLEVEL, response.Content);
             //Console.WriteLine(response.Content);
 
@@ -547,7 +547,7 @@ namespace ChunbokAegis
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
-                throw new Exception("Calling UpdateIncidents returned status :" + response.StatusCode);
+                throw new Exception("ERROR Calling UpdateIncidents returned status :" + (int)response.StatusCode + "-" + response.StatusCode);
             }
 
             //IRestResponse response = client.Execute(request);
