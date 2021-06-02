@@ -16,20 +16,7 @@ namespace CleanerFunctionApp
 {
     public static class CleanerFunction
     {
-        [FunctionName("HTTPFunction-Cleaner")]
-        public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
-            ILogger log)
-        {
-            string revision = "rev-4_" + DateTime.Now;
-
-            log.LogInformation("C# HTTP trigger function processed a request.");
-
-            //Initialize Collections 
-            DateTime startTime = DateTime.Now;
-
-            
-            var binDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        tingAssembly().Location);
             var rootDirectory = Path.GetFullPath(Path.Combine(binDirectory, ".."));
 
             log.LogInformation("binDirectory = " + binDirectory);

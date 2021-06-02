@@ -3,11 +3,10 @@ using System;
 
 namespace ConsoleApp1
 {
-    class Program
+    class Program ttttttttttttt
+
     {
-        static void Main(string[] args)
-        {
-            Console.WriteLine("Hello World!");
+      
 
             //Ref https://www.newtonsoft.com/json/help/html/CreatingLINQtoJSON.htm
             JObject rss;
@@ -31,7 +30,7 @@ namespace ConsoleApp1
                                     )))));
                                                                     
 
-            Console.WriteLine(rss.ToString());
+        
 
             //Get Endpoint
             rss = new JObject(
